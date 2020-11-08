@@ -7,7 +7,7 @@ import time
 import math
 import datetime
 import cv2
-import paho.mqtt.client as mqtt
+# import paho.mqtt.client as mqtt
 import numpy as np
 import argparse
 
@@ -113,7 +113,7 @@ def store_traffic_data():
         ',"field3":' + ("%d" % counter) +\
         ',"field4":' + ("%.0f" % sd) +\
         '}'
-    client.publish('traffic', jsonstring)  #Publish MQTT data
+    # client.publish('traffic', jsonstring)  #Publish MQTT data
     
     
 # define some constants
@@ -236,10 +236,10 @@ cv2.namedWindow("Speed Camera")
 cv2.moveWindow("Speed Camera", 10, 40)
  
 #Create MQTT client and connect
-client = mqtt.Client('traffic_cam')
-client.username_pw_set('xxxxxx', password='xxxxxxxxxxxxx')
-client.connect(broker_address)
-client.loop_start()
+# client = mqtt.Client('traffic_cam')
+# client.username_pw_set('xxxxxx', password='xxxxxxxxxxxxx')
+# client.connect(broker_address)
+# client.loop_start()
 
 if SAVE_CSV:
     csvfileout = "carspeed_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d_%H%M"))
@@ -504,7 +504,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         # if the `q` key is pressed, break from the loop and terminate processing
         if key == ord("q"):
             client.loop_stop()
-            client.disconnect()   ##disconnect from mqtt broker
+            # client.disconnect()   ##disconnect from mqtt broker
             break
          
     # clear the stream in preparation for the next frame
