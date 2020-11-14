@@ -6,11 +6,19 @@ from picamera import PiCamera
 import time
 import math
 import datetime
+import os
 import cv2
 import paho.mqtt.client as mqtt
 import numpy as np
 import argparse
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
+## create folders for data storage
+if not os.path.exists('images'):
+    os.mkdir('images')
+if not os.path.exists('data'):
+    os.mkdir('data')
 
 # place a prompt on the displayed image
 def prompt_on_image(txt):
@@ -94,7 +102,7 @@ def store_image():
     cv2.putText(image, "%.0f mph" % mean_speed,
     (cntr_x , int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00, (0, 255, 0), 3)
     # and save the image to disk
-    imageFilename = "car_at_" + cap_time.strftime("%Y%m%d_%H%M%S") + ".jpg"
+    imageFilename = os.path.join('images', "car_at_" + cap_time.strftime("%Y%m%d_%H%M%S") + ".jpg")
     cv2.imwrite(imageFilename,image)
 
 def store_traffic_data():
@@ -105,6 +113,12 @@ def store_traffic_data():
     ("%d" % direction) + ',' + ("%d" % counter) + ','+ ("%d" % sd))
 
     record_speed(csvString)
+
+    if SAVE_GOOGLE:
+        try:
+            sheet.append_row([cap_time, mean_speed, direction, counter, sd])
+        except:
+            pass
 
     jsonstring = '{"created_at":'+'"'+ cap_time.strftime("%Y-%m-%d")+\
         ' ' + cap_time.strftime('%H:%M:%S:%f')+'"' +\
@@ -121,6 +135,7 @@ L2R_DISTANCE = 47  #<---- enter your distance-to-road value for cars going left 
 R2L_DISTANCE = 37  #<---- enter your distance-to-road value for cars going left to right here
 MIN_SPEED_IMAGE = 50  #<---- enter the minimum speed for saving images
 SAVE_CSV = True  #<---- record the results in .csv format in carspeed_(date).csv
+SAVE_GOOGLE = True
 MIN_SPEED_SAVE = 10  #<---- enter the minimum speed for publishing to MQTT broker and saving to CSV
 MAX_SPEED_SAVE = 80  #<---- enter the maximum speed for publishing to MQTT broker and saving to CSV
 
@@ -156,6 +171,15 @@ ap.add_argument("-lrx", "--lower_right_x", required=True,
 ap.add_argument("-lry", "--lower_right_y", required=True,
     help="lower right y coord")
 args = vars(ap.parse_args())
+
+if SAVE_GOOGLE:
+    # use creds to create a client to interact with the Google Drive API
+    # and find a google sheet
+    # install these packages with `pip install gspread oauth2client`
+    scope = ['https://spreadsheets.google.com/feeds']
+    creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    client = gspread.authorize(creds)
+    sheet = client.open_by_key("1lkBEF47bZitntTi2LzVFpSSxjDKxUZnH9W0J1vbbGMY").sheet1
 
 upper_left_x = int(args["upper_left_x"]);
 upper_left_y = int(args["upper_left_y"]);
@@ -242,7 +266,7 @@ client.connect(broker_address)
 client.loop_start()
 
 if SAVE_CSV:
-    csvfileout = "carspeed_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d_%H%M"))
+    csvfileout = os.path.join('data', "carspeed_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d_%H%M")))
     record_speed('DateTime,Speed,Direction, Counter,SD, Image,')
 else:
     csvfileout = ''
@@ -421,7 +445,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
                         store_image()
                     
                     # save the data if required and above min speed for data
-                    if SAVE_CSV and mean_speed > MIN_SPEED_SAVE and mean_speed < MAX_SPEED_SAVE:
+                    if (SAVE_CSV or SAVE_GOOGLE) and mean_speed > MIN_SPEED_SAVE and mean_speed < MAX_SPEED_SAVE:
                         store_traffic_data()
                     
                     counter = 0
