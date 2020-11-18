@@ -8,7 +8,7 @@ import math
 import datetime
 import os
 import cv2
-import paho.mqtt.client as mqtt
+# import paho.mqtt.client as mqtt
 import numpy as np
 import argparse
 import gspread
@@ -127,13 +127,13 @@ def store_traffic_data():
         ',"field3":' + ("%d" % counter) +\
         ',"field4":' + ("%.0f" % sd) +\
         '}'
-    client.publish('traffic', jsonstring)  #Publish MQTT data
+    # client.publish('traffic', jsonstring)  #Publish MQTT data
     
     
 # define some constants
-L2R_DISTANCE = 47  #<---- enter your distance-to-road value for cars going left to right here
-R2L_DISTANCE = 37  #<---- enter your distance-to-road value for cars going left to right here
-MIN_SPEED_IMAGE = 50  #<---- enter the minimum speed for saving images
+L2R_DISTANCE = 49.3  # Adi's room <---- enter your distance-to-road value for cars going left to right here
+R2L_DISTANCE = 61.85  # Adi's room <---- enter your distance-to-road value for cars going left to right here
+MIN_SPEED_IMAGE = 40  #<---- enter the minimum speed for saving images
 SAVE_CSV = True  #<---- record the results in .csv format in carspeed_(date).csv
 SAVE_GOOGLE = True
 MIN_SPEED_SAVE = 10  #<---- enter the minimum speed for publishing to MQTT broker and saving to CSV
@@ -260,10 +260,10 @@ cv2.namedWindow("Speed Camera")
 cv2.moveWindow("Speed Camera", 10, 40)
  
 #Create MQTT client and connect
-client = mqtt.Client('traffic_cam')
-client.username_pw_set('xxxxxx', password='xxxxxxxxxxxxx')
-client.connect(broker_address)
-client.loop_start()
+# client = mqtt.Client('traffic_cam')
+# client.username_pw_set('xxxxxx', password='xxxxxxxxxxxxx')
+# client.connect(broker_address)
+# client.loop_start()
 
 if SAVE_CSV:
     csvfileout = os.path.join('data', "carspeed_{}.csv".format(datetime.datetime.now().strftime("%Y%m%d_%H%M")))
@@ -528,7 +528,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         # if the `q` key is pressed, break from the loop and terminate processing
         if key == ord("q"):
             client.loop_stop()
-            client.disconnect()   ##disconnect from mqtt broker
+            # client.disconnect()   ##disconnect from mqtt broker
             break
          
     # clear the stream in preparation for the next frame
