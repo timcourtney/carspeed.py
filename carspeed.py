@@ -106,7 +106,7 @@ def store_image():
     cv2.imwrite(imageFilename,image)
 
 def store_traffic_data():
-    global cap_time, mean_speed, direction, counter, sd, client
+    global cap_time, mean_speed, direction, counter, sd, client, sheet
 
     csvString=(cap_time.strftime("%Y-%m-%d") + ' ' +\
     cap_time.strftime('%H:%M:%S:%f')+','+("%.0f" % mean_speed) + ',' +\
