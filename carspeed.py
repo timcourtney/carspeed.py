@@ -108,12 +108,10 @@ def store_image():
 def store_traffic_data():
     global cap_time, mean_speed, direction, counter, sd, client, sheet
 
-    formatted_date = cap_time.strftime("%Y-%m-%d")
-    csvString=(formatted_date + ' ' +\
-    cap_time.strftime('%H:%M:%S:%f')+','+("%.0f" % mean_speed) + ',' +\
+    formatted_date = cap_time.strftime("%Y-%m-%d %H:%M:%S:%f")
+    csvString=(formatted_date + ','+("%.0f" % mean_speed) + ',' +\
     ("%d" % direction) + ',' + ("%d" % counter) + ','+ ("%d" % sd))
 
-    print("recording speed: " + csvString)
     record_speed(csvString)
 
     if SAVE_GOOGLE:
