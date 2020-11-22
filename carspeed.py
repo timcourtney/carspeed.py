@@ -185,7 +185,7 @@ if SAVE_GOOGLE:
     scope = ['https://spreadsheets.google.com/feeds']
     creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
     client = gspread.authorize(creds)
-    sheet = client.open_by_key("1lkBEF47bZitntTi2LzVFpSSxjDKxUZnH9W0J1vbbGMY").sheet1
+    sheet = client.open_by_key("1lkBEF47bZitntTi2LzVFpSSxjDKxUZnH9W0J1vbbGMY").worksheet("Data")
 
 upper_left_x = int(args["upper_left_x"]);
 upper_left_y = int(args["upper_left_y"]);
