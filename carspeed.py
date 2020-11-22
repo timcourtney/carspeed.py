@@ -112,15 +112,16 @@ def store_traffic_data():
     global cap_time, mean_speed, direction, counter, sd, client, sheet
 
     formatted_date = cap_time.strftime("%Y-%m-%d %H:%M:%S:%f")
+    file_name = get_image_filename(cap_time)
     csvString=(formatted_date + ','+("%.0f" % mean_speed) + ',' +\
     ("%d" % direction) + ',' + ("%d" % counter) + ','+ ("%d" % sd) +\
-    ',' + get_image_filename(cap_time))
+    ',' + file_name)
 
     record_speed(csvString)
 
     if SAVE_GOOGLE:
         try:
-           sheet.append_row([formatted_date, mean_speed, direction, counter, sd, get_image_filename(cap_time)])
+           sheet.append_row([formatted_date, mean_speed, direction, counter, sd, file_name])
         except Exception as e:
             print(e)
 
