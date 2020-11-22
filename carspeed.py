@@ -90,6 +90,9 @@ def get_threshold(light):
     print("threshold= " + str(threshold))
     return threshold
 
+def get_image_filename(cap_time):
+    return os.path.join('images', "car_at_" + cap_time.strftime("%Y%m%d_%H%M%S") + ".jpg")
+
 def store_image():
     # timestamp the image - 
     global cap_time, image, mean_speed
@@ -102,7 +105,7 @@ def store_image():
     cv2.putText(image, "%.0f mph" % mean_speed,
     (cntr_x , int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00, (0, 255, 0), 3)
     # and save the image to disk
-    imageFilename = os.path.join('images', "car_at_" + cap_time.strftime("%Y%m%d_%H%M%S") + ".jpg")
+    imageFilename = get_image_filename(cap_time)
     cv2.imwrite(imageFilename,image)
 
 def store_traffic_data():
@@ -110,13 +113,14 @@ def store_traffic_data():
 
     formatted_date = cap_time.strftime("%Y-%m-%d %H:%M:%S:%f")
     csvString=(formatted_date + ','+("%.0f" % mean_speed) + ',' +\
-    ("%d" % direction) + ',' + ("%d" % counter) + ','+ ("%d" % sd))
+    ("%d" % direction) + ',' + ("%d" % counter) + ','+ ("%d" % sd) +\
+    ',' + get_image_filename(cap_time))
 
     record_speed(csvString)
 
     if SAVE_GOOGLE:
         try:
-           sheet.append_row([formatted_date, mean_speed, direction, counter, sd])
+           sheet.append_row([formatted_date, mean_speed, direction, counter, sd, get_image_filename(cap_time)])
         except Exception as e:
             print(e)
 
