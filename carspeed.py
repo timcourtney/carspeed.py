@@ -105,8 +105,7 @@ def store_image():
     cv2.putText(image, "%.0f mph" % mean_speed,
     (cntr_x , int(IMAGEHEIGHT * 0.2)), cv2.FONT_HERSHEY_SIMPLEX, 2.00, (0, 255, 0), 3)
     # and save the image to disk
-    imageFilename = get_image_filename(cap_time)
-    cv2.imwrite(imageFilename,image)
+    cv2.imwrite(get_image_filename(cap_time),image)
 
 def store_traffic_data():
     global cap_time, mean_speed, direction, counter, sd, client, sheet
@@ -121,7 +120,9 @@ def store_traffic_data():
 
     if SAVE_GOOGLE:
         try:
-           sheet.append_row([formatted_date, mean_speed, direction, counter, sd, file_name])
+           data = [formatted_date, mean_speed, direction, counter, sd, file_name]
+           print(data)
+           sheet.append_row(data)
         except Exception as e:
             print(e)
 
